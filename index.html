@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>彭博财经终端 | 每日全球与国内焦点新闻看板</title>
-    <!-- Open Graph 微信/社交分享卡片元数据 -->
-    <meta property="og:title" content="彭博财经终端 | 每日新闻看板">
-    <meta property="og:description" content="彭博全球Top 10、亚太Top 5、国内Top 5重磅财经资讯精编">
-    <meta property="og:type" content="website">
-    
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,16 +23,15 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2canvas 用于生成海报 -->
+    <!-- html2canvas & QRCode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- 二维码生成库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         .tab-active { border-bottom: 2px solid #F0B90B; color: #F0B90B; font-weight: bold; }
     </style>
 </head>
-<body class="bg-bbDark text-gray-100 min-h-screen pb-12 transition-colors duration-200 light:bg-gray-100 light:text-gray-900" id="mainBody">
+<body class="bg-bbDark text-gray-100 min-h-screen pb-12 transition-colors duration-200" id="mainBody">
 
     <!-- 顶栏 Header -->
     <header class="sticky top-0 z-40 bg-bbDark/95 border-b border-bbBorder px-4 py-3 backdrop-blur-md flex justify-between items-center">
@@ -46,11 +40,9 @@
             <span class="text-sm font-bold tracking-wider">财经焦点看板</span>
         </div>
         <div class="flex items-center space-x-2">
-            <button onclick="toggleTheme()" class="text-gray-400 hover:text-bbGold text-sm p-1.5" title="切换主题">
-                <i class="fa-solid fa-moon" id="themeIcon"></i>
-            </button>
-            <button onclick="generateThreePosters()" class="bg-bbGold text-black text-xs font-bold px-3 py-1.5 rounded-full hover:bg-yellow-400 transition flex items-center gap-1">
-                <i class="fa-solid fa-images"></i> 生成朋友圈3图
+            <button onclick="toggleTheme()" class="text-gray-400 hover:text-bbGold text-sm p-1.5"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+            <button onclick="generateSixPosters()" class="bg-bbGold text-black text-xs font-bold px-3 py-1.5 rounded-full hover:bg-yellow-400 transition flex items-center gap-1">
+                <i class="fa-solid fa-images"></i> 生成朋友圈 6 图
             </button>
             <button onclick="copyWechatText()" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-blue-500 transition flex items-center gap-1">
                 <i class="fa-solid fa-terminal"></i> 复制终端文案
@@ -58,7 +50,7 @@
         </div>
     </header>
 
-    <!-- 顶部状态与更新时间 -->
+    <!-- 状态与更新时间 -->
     <div class="max-w-3xl mx-auto px-4 mt-4 flex justify-between items-center text-xs text-bbTextMuted">
         <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -67,7 +59,7 @@
         <div id="updateTime">更新时间: 2026-10-09 08:00 (CST)</div>
     </div>
 
-    <!-- 搜索与筛选控制区 -->
+    <!-- 搜索 -->
     <div class="max-w-3xl mx-auto px-4 mt-3">
         <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-500 text-xs"></i>
@@ -76,49 +68,35 @@
         </div>
     </div>
 
-    <!-- 导航 Tabs -->
+    <!-- Tabs -->
     <div class="max-w-3xl mx-auto px-4 mt-4 border-b border-bbBorder flex space-x-6 text-sm">
-        <button onclick="switchTab('global')" id="tab-global" class="py-2 text-xs font-bold tracking-wider tab-active transition">
-            彭博全球 Top 10
-        </button>
-        <button onclick="switchTab('asia')" id="tab-asia" class="py-2 text-xs font-bold tracking-wider text-gray-400 transition">
-            亚太焦点 Top 5
-        </button>
-        <button onclick="switchTab('china')" id="tab-china" class="py-2 text-xs font-bold tracking-wider text-gray-400 transition">
-            国内核心 Top 5
-        </button>
+        <button onclick="switchTab('global')" id="tab-global" class="py-2 text-xs font-bold tracking-wider tab-active transition">彭博全球 Top 10</button>
+        <button onclick="switchTab('asia')" id="tab-asia" class="py-2 text-xs font-bold tracking-wider text-gray-400 transition">亚太焦点 Top 5</button>
+        <button onclick="switchTab('china')" id="tab-china" class="py-2 text-xs font-bold tracking-wider text-gray-400 transition">国内核心 Top 5</button>
     </div>
 
-    <!-- 新闻列表容器 -->
-    <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4" id="newsContainer">
-        <!-- 动态由 JS 填充 -->
-    </main>
+    <!-- 列表容器 -->
+    <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4" id="newsContainer"></main>
 
-    <!-- 底部版权提示 -->
     <footer class="max-w-3xl mx-auto text-center mt-10 px-4 text-xs text-bbTextMuted space-y-1">
-        <p>免责声明：本看板内容基于 Bloomberg 及公开市场数据综合二次编译整理，仅供信息参考，不构成投资建议。</p>
+        <p>免责声明：本看板内容基于 Bloomberg 及公开市场数据综合二次编译整理，仅供信息参考。</p>
         <p>© 2026 Financial News Terminal. All rights reserved.</p>
     </footer>
 
-    <!-- 三图海报预览弹窗 -->
+    <!-- 海报弹窗 -->
     <div id="posterModal" class="fixed inset-0 bg-black/85 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-bbCard border border-bbBorder rounded-xl max-w-sm w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="p-3 border-b border-bbBorder flex justify-between items-center">
-                <span class="text-xs font-bold text-bbGold"><i class="fa-solid fa-circle-check"></i> 朋友圈3张图套卡已生成</span>
-                <button onclick="closeModal('posterModal')" class="text-gray-400 hover:text-white text-sm">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <span class="text-xs font-bold text-bbGold"><i class="fa-solid fa-circle-check"></i> 9:16 等尺寸 6 张套图（含星际末页）</span>
+                <button onclick="closeModal('posterModal')" class="text-gray-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-4 bg-gray-900" id="posterRenderArea">
-                <!-- 生成的 Canvas 图片列表将追加到这里 -->
-            </div>
-            <div class="p-3 border-t border-bbBorder text-center text-xs text-gray-400">
-                💡 提示：分别长按保存上面 3 张图片，按顺序发布朋友圈，效果最佳！
-            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-4 bg-gray-900" id="posterRenderArea"></div>
+            <div class="p-3 border-t border-bbBorder text-center text-xs text-gray-400">💡 提示：6 张海报尺寸完全一致，长按保存依次发送朋友圈！</div>
         </div>
     </div>
 
-    <!-- 数据与逻辑 -->
+    <!-- 自动化注入标记 (请勿删除以下两行注释) -->
+    <!-- NEWS_DATA_START -->
     <script>
         const newsData = {
             global: [
@@ -148,20 +126,19 @@
                 { id: "NO.01", title: "宏观组合政策效果显现 核心经济指标展现回升向好态势", time: "05:15", tag: "宏观经济", summary: "最新公布的制造业PMI重返扩张区间，出口及风险偏好同步回暖，外资机构相继上调中国全年GDP增长预期。", impact: "极大提升权益市场风险偏好，离岸人民币汇率升值空间打开，吸引外资回流A股/港股。", asset: "沪深300指数, 恒生科技指数, FXI" }
             ]
         };
+    </script>
+    <!-- NEWS_DATA_END -->
 
+    <script>
         let currentTab = 'global';
 
         function renderNews(tab = 'global', filterKeyword = '') {
             const container = document.getElementById('newsContainer');
             container.innerHTML = '';
+            let list = newsData[tab] || [];
 
-            let list = newsData[tab];
             if (filterKeyword) {
-                list = list.filter(item => 
-                    item.title.includes(filterKeyword) || 
-                    item.summary.includes(filterKeyword) ||
-                    item.tag.includes(filterKeyword)
-                );
+                list = list.filter(item => item.title.includes(filterKeyword) || item.summary.includes(filterKeyword) || item.tag.includes(filterKeyword));
             }
 
             if (list.length === 0) {
@@ -169,10 +146,9 @@
                 return;
             }
 
-            list.forEach((item, index) => {
+            list.forEach((item) => {
                 const card = document.createElement('div');
                 card.className = "bg-bbCard border border-bbBorder rounded-lg p-4 space-y-2.5 hover:border-bbGold/50 transition duration-150 shadow-sm";
-                
                 card.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
                         <div class="flex items-center space-x-2">
@@ -181,25 +157,14 @@
                         </div>
                         <span class="text-bbTextMuted font-mono text-[11px]"><i class="fa-regular fa-clock"></i> ${item.time}</span>
                     </div>
-                    <h3 class="text-sm font-bold leading-snug text-gray-100">
-                        ${item.title}
-                    </h3>
-                    <p class="text-xs text-gray-300 leading-relaxed">
-                        ${item.summary}
-                    </p>
-                    
+                    <h3 class="text-sm font-bold leading-snug text-gray-100">${item.title}</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">${item.summary}</p>
                     <div class="pt-2.5 border-t border-bbBorder/60 space-y-1.5 text-xs bg-black/20 p-2.5 rounded">
-                        <div class="text-gray-300">
-                            <span class="text-bbGold font-bold">📌 市场传导影响：</span> ${item.impact}
-                        </div>
-                        <div class="text-gray-300">
-                            <span class="text-blue-400 font-bold">💡 关联资产标的：</span> <span class="font-mono text-gray-200">${item.asset}</span>
-                        </div>
+                        <div class="text-gray-300"><span class="text-bbGold font-bold">📌 市场传导影响：</span> ${item.impact}</div>
+                        <div class="text-gray-300"><span class="text-blue-400 font-bold">💡 关联资产标的：</span> <span class="font-mono text-gray-200">${item.asset}</span></div>
                     </div>
-
                     <div class="pt-0.5 flex justify-between items-center text-[10px] text-bbTextMuted">
-                        <span>彭博财经 · 每日精编</span>
-                        <span>来源: Bloomberg/公开数据</span>
+                        <span>彭博财经 · 每日精编</span><span>来源: Bloomberg/公开数据</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -208,17 +173,14 @@
 
         function switchTab(tab) {
             currentTab = tab;
-            document.querySelectorAll('[id^="tab-"]').forEach(btn => {
-                btn.className = "py-2 text-xs font-bold tracking-wider text-gray-400 transition";
-            });
+            document.querySelectorAll('[id^="tab-"]').forEach(btn => btn.className = "py-2 text-xs font-bold tracking-wider text-gray-400 transition");
             document.getElementById(`tab-${tab}`).className = "py-2 text-xs font-bold tracking-wider tab-active transition";
             document.getElementById('searchInput').value = '';
             renderNews(tab);
         }
 
         function filterNews() {
-            const kw = document.getElementById('searchInput').value.trim();
-            renderNews(currentTab, kw);
+            renderNews(currentTab, document.getElementById('searchInput').value.trim());
         }
 
         function toggleTheme() {
@@ -226,110 +188,112 @@
             const icon = document.getElementById('themeIcon');
             if (body.classList.contains('dark')) {
                 body.classList.remove('dark');
-                body.classList.add('light');
                 icon.className = "fa-solid fa-sun text-yellow-500";
             } else {
-                body.classList.remove('light');
                 body.classList.add('dark');
                 icon.className = "fa-solid fa-moon";
             }
         }
 
-        // 一键生成完整覆盖 20 条新闻的“黄金三张套卡海报”
-        async function generateThreePosters() {
+        async function generateSixPosters() {
             const renderArea = document.getElementById('posterRenderArea');
-            renderArea.innerHTML = '<div class="text-center text-xs text-bbGold py-4"><i class="fa-solid fa-spinner fa-spin"></i> 正在渲染 3 张高清晰套图...</div>';
+            renderArea.innerHTML = '<div class="text-center text-xs text-bbGold py-4"><i class="fa-solid fa-spinner fa-spin"></i> 正在生成 6 张 9:16 标准高清晰套图...</div>';
             document.getElementById('posterModal').classList.remove('hidden');
 
-            const cardDataSets = [
-                { title: "彭博全球 Top 10 (Part 1)", items: newsData.global.slice(0, 5) },
-                { title: "彭博全球 Top 10 (Part 2)", items: newsData.global.slice(5, 10) },
-                { title: "亚太 Top 5 & 国内 Top 5 核心", items: [...newsData.asia, ...newsData.china] }
+            const allNews = [
+                ...newsData.global.map(i => ({ ...i, section: '彭博全球 Top 10' })),
+                ...newsData.asia.map(i => ({ ...i, section: '亚太焦点 Top 5' })),
+                ...newsData.china.map(i => ({ ...i, section: '国内核心 Top 5' }))
             ];
+
+            const chunkSize = 4;
+            const chunks = [];
+            for (let i = 0; i < allNews.length; i += chunkSize) {
+                chunks.push(allNews.slice(i, i + chunkSize));
+            }
 
             renderArea.innerHTML = '';
 
-            for (let idx = 0; idx < cardDataSets.length; idx++) {
-                const dataGroup = cardDataSets[idx];
+            for (let idx = 0; idx < chunks.length; idx++) {
+                const group = chunks[idx];
                 const wrapper = document.createElement('div');
-                wrapper.style.position = 'absolute';
-                wrapper.style.left = '-9999px';
-                wrapper.style.width = '375px';
-                wrapper.style.backgroundColor = '#0D1117';
-                wrapper.style.color = '#FFFFFF';
-                wrapper.style.padding = '20px';
-                wrapper.style.fontFamily = 'sans-serif';
-                wrapper.style.borderRadius = '12px';
+                wrapper.style.cssText = "position:absolute;left:-9999px;width:375px;height:667px;background-color:#0D1117;color:#FFF;padding:18px 16px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;";
 
-                let itemsHtml = dataGroup.items.map(item => `
-                    <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #30363D;">
-                        <div style="font-size: 10px; color: #F0B90B; font-weight: bold;">${item.id} · ${item.tag}</div>
-                        <div style="font-size: 12px; font-weight: bold; margin: 2px 0; color: #FFF;">${item.title}</div>
-                        <div style="font-size: 10px; color: #9CA3AF; line-height: 1.3;">${item.summary}</div>
+                let itemsHtml = group.map(item => `
+                    <div style="height:118px;border-bottom:1px solid #30363D;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+                        <div style="font-size:10px;color:#F0B90B;font-weight:bold;display:flex;justify-content:space-between;">
+                            <span>${item.id} · ${item.tag}</span><span style="color:#6B7280;font-size:9px;">${item.section}</span>
+                        </div>
+                        <div style="font-size:12px;font-weight:bold;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:3px 0;">${item.title}</div>
+                        <div style="font-size:10px;color:#9CA3AF;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.summary}</div>
                     </div>
                 `).join('');
 
                 wrapper.innerHTML = `
-                    <div style="border-bottom: 2px solid #F0B90B; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div style="height:45px;border-bottom:2px solid #F0B90B;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:6px;">
                         <div>
-                            <div style="background: #F0B90B; color: #000; font-size: 9px; font-weight: 900; display: inline-block; padding: 1px 4px; border-radius: 2px;">BLOOMBERG</div>
-                            <div style="font-size: 15px; font-weight: bold; margin-top: 4px; color: #FFF;">${dataGroup.title}</div>
+                            <div style="background:#F0B90B;color:#000;font-size:8px;font-weight:900;display:inline-block;padding:1px 4px;border-radius:2px;">BLOOMBERG</div>
+                            <div style="font-size:14px;font-weight:bold;color:#FFF;margin-top:2px;">每日财经看板</div>
                         </div>
-                        <div style="font-size: 9px; color: #8B949E; text-align: right;">卡片 ${idx + 1}/3</div>
+                        <div style="font-size:9px;color:#8B949E;text-align:right;">全景套卡 (${idx + 1}/6)</div>
                     </div>
-                    ${itemsHtml}
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid #30363D; padding: 8px; border-radius: 6px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-around;margin:6px 0;">${itemsHtml}</div>
+                    <div style="height:55px;background:rgba(255,255,255,0.03);border:1px solid #30363D;padding:6px 10px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;">
                         <div>
-                            <div style="font-size: 10px; color: #F0B90B; font-weight: bold;">长按识别二维码</div>
-                            <div style="font-size: 9px; color: #9CA3AF;">在线查看交互式终端看板</div>
+                            <div style="font-size:10px;color:#F0B90B;font-weight:bold;">长按识别二维码</div>
+                            <div style="font-size:8px;color:#9CA3AF;">在线查看完整 20 条解读与标的</div>
                         </div>
-                        <div id="qr-${idx}" style="background: #FFF; padding: 3px; border-radius: 3px;"></div>
+                        <div id="qr-eq-${idx}" style="background:#FFF;padding:2px;border-radius:2px;"></div>
                     </div>
                 `;
 
                 document.body.appendChild(wrapper);
-
-                new QRCode(wrapper.querySelector(`#qr-${idx}`), {
-                    text: window.location.href,
-                    width: 45,
-                    height: 45
-                });
-
+                new QRCode(wrapper.querySelector(`#qr-eq-${idx}`), { text: window.location.href, width: 40, height: 40 });
                 await new Promise(r => setTimeout(r, 120));
-
                 const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#0D1117' });
                 const img = document.createElement('img');
                 img.src = canvas.toDataURL('image/png');
-                img.style.maxWidth = '100%';
-                img.style.borderRadius = '8px';
-                img.style.border = '1px solid #30363D';
+                img.style.cssText = "width:100%;border-radius:8px;border:1px solid #30363D;";
                 renderArea.appendChild(img);
-
                 document.body.removeChild(wrapper);
             }
+
+            // 第 6 张艺术末页
+            const lastWrapper = document.createElement('div');
+            lastWrapper.style.cssText = `position:absolute;left:-9999px;width:375px;height:667px;background-size:cover;background-position:center;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;padding:24px 20px;background-image:url('https://image.pollinations.ai/prompt/interstellar%20water%20planet%20ocean%20waves%20astronauts%20walking%20cinematic%20movie%20still?width=750&height=1334&nologo=true');`;
+            lastWrapper.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);">
+                    <div style="background:#F0B90B;color:#000;font-size:8px;font-weight:900;padding:2px 5px;border-radius:2px;">BLOOMBERG</div>
+                    <div style="font-size:9px;color:#E5E7EB;letter-spacing:1px;">END PAGE · (6/6)</div>
+                </div>
+                <div style="text-align:center;background:rgba(0,0,0,0.25);backdrop-filter:blur(2px);padding:30px 10px;border-radius:12px;">
+                    <div style="font-family:'Playfair Display', Georgia, serif;font-size:38px;font-style:italic;font-weight:700;color:#FFF;text-shadow:0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(240,185,11,0.6);">God bless you</div>
+                    <div style="margin-top:12px;font-size:10px;color:#F0B90B;font-weight:600;">✦ 愿智慧与财富同在 ✦</div>
+                </div>
+                <div style="text-align:center;font-size:9px;color:#D1D5DB;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);padding:6px;border-radius:6px;">2026 FINANCIAL NEWS TERMINAL · ALL RIGHTS RESERVED</div>
+            `;
+            document.body.appendChild(lastWrapper);
+            await new Promise(r => setTimeout(r, 150));
+            const lastCanvas = await html2canvas(lastWrapper, { scale: 2 });
+            const lastImg = document.createElement('img');
+            lastImg.src = lastCanvas.toDataURL('image/png');
+            lastImg.style.cssText = "width:100%;border-radius:8px;border:1px solid #30363D;";
+            renderArea.appendChild(lastImg);
+            document.body.removeChild(lastWrapper);
         }
 
         function copyWechatText() {
-            const list = newsData[currentTab];
+            const list = newsData[currentTab] || [];
             const tabName = currentTab === 'global' ? '彭博全球 Top 10' : (currentTab === 'asia' ? '亚太焦点 Top 5' : '国内核心 Top 5');
-            
-            let txt = `▍ BLOOMBERG 彭博财经终端 · ${tabName}\n📅 2026-10-09 每日精编\n--------------------------------\n\n`;
+            let txt = `▍ BLOOMBERG 彭博财经终端 · ${tabName}\n--------------------------------\n\n`;
             list.forEach(item => {
                 txt += `◆ ${item.id} | ${item.title}\n▸ 简讯：${item.summary}\n▸ 影响：${item.impact}\n\n`;
             });
-            txt += `---
-数据来源：Bloomberg 及公开数据综合编译`;
-
-            navigator.clipboard.writeText(txt).then(() => {
-                alert('✅ 彭博终端风格文案已成功复制！\n\n您可直接粘贴至朋友圈/微信群，并搭配海报发布。');
-            }).catch(() => {
-                alert('文案生成成功，请手动选择复制。');
-            });
+            txt += `--- \n数据来源：Bloomberg 及公开数据综合编译`;
+            navigator.clipboard.writeText(txt).then(() => alert('✅ 彭博终端风格文案已成功复制！'));
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         renderNews('global');
     </script>
